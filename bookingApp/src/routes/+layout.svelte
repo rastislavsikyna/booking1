@@ -11,6 +11,7 @@
 
 
 
-<main class="flex flex-col items-center text-center min-h-screen">
+<main class=" ">
 {@render children?.()}
 </main>
+

@@ -2,7 +2,7 @@
 	import Timer from '$lib/components/Timer.svelte';
 </script>
 
-<main>
+<main class="justify-center items-center text-center">
 	<h1>Actual Time</h1>
 	<Timer />
 </main>
