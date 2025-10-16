@@ -6,17 +6,87 @@
 
 
     let { data }: PageProps = $props();
-
+    let infoModal = $state('')
+    let infoModal2 = $state('')
+    
+// ONEWAY STATE
     let isOneWayCalendar = $state(false);
+    let OneWayDateTime = $state <string>('');
+    let oneWayList = $state<string[]>([]);
+
+// RETURN STATE
+    let ReturnFlightDateTime = $state <string>();
+    let ReturnFlightDateTime2 = $state <string>();
     let isReturnFlightCalendar = $state(false);
-    let OneWayDateTime = $state <Date>();
-    $inspect(OneWayDateTime)
+    let ReturnList = $state<string[]>([]);
+    let ReturnList2 = $state<string[]>([]);
 
-    let ReturnFlightDateTime = $state <Date>();
-    $inspect(ReturnFlightDateTime)
+ //  LOGIC ONEWAY
+    function handleOneWayBook() {
+      if (OneWayDateTime) {
+      oneWayList.pop();
+      oneWayList.push(OneWayDateTime)
+      localStorage.setItem('Oneway', oneWayList.toString())
 
-    let ReturnFlightDateTime2 = $state <Date>();
-    $inspect(ReturnFlightDateTime2)
+      infoModal = 'Thank you for choosing your Date. Modal closing...'
+      setTimeout(() =>{
+        isOneWayCalendar = false
+        infoModal= ''
+      }, 3000);
+     
+    }else{
+      infoModal = 'Please fill Flight Date'
+
+    } } 
+   $effect(() =>{
+    let getLc = localStorage.getItem('oneWay');
+    oneWayList = getLc ? [getLc] : [];
+   })
+
+  // LOGIC RETURN
+   function handleReturnBook() {
+      if (ReturnFlightDateTime) {
+      ReturnList.pop();
+      ReturnList.push(ReturnFlightDateTime)
+      localStorage.setItem('Return', ReturnList.toString())
+
+      infoModal2 = 'Thank you for choosing your Date. Modal closing...'
+      setTimeout(() =>{
+        isReturnFlightCalendar = false
+        infoModal2= ''
+      }, 3000);
+     
+    }else{
+      infoModal2 = 'Please fill Flight Date'
+
+    } } 
+   $effect(() =>{
+    let getLc = localStorage.getItem('Return');
+    ReturnList = getLc ? [getLc] : [];
+   })
+   
+  // LOGIC RETURN 2
+  function handleReturnBook2() {
+      if (ReturnFlightDateTime) {
+      ReturnList2.pop();
+      ReturnList2.push(ReturnFlightDateTime)
+      localStorage.setItem('Return', ReturnList.toString())
+
+      infoModal = 'Thank you for choosing your Date. Modal closing...'
+      setTimeout(() =>{
+        isReturnFlightCalendar = false
+        infoModal2= ''
+      }, 3000);
+     
+    }else{
+      infoModal2 = 'Please fill Flight Date'
+
+    } } 
+   $effect(() =>{
+    let getLc = localStorage.getItem('Return');
+    ReturnList2 = getLc ? [getLc] : [];
+   })
+    
 </script>
 
 
@@ -34,7 +104,7 @@
     isReturnFlightCalendar = false
     isOneWayCalendar= true  }
 }
-   class="  border rounded-t-4xl pl-20 pr-20 pb-3 pt-3 text-3xl bg-gray-300 hover:bg-gray-400 cursor-pointer ">One-way Flight</button> 
+   class="  border rounded-t-4xl pl-20 p-20 pb-3 pt-3 text-3xl bg-gray-300 hover:bg-gray-400 cursor-pointer ">One-way Flight</button> 
 
    
   </section>
@@ -55,17 +125,24 @@
   <div class="relative flex w-lg flex-col  border border-black mx-auto lg:mt-44 rounded-3xl shadow-2xl  ">
    <h1 class="text-2xl">One-Way Flight</h1>
 
+
+
+<!-- INPUTCALENDAR -->
    <input type="datetime-local" bind:value={OneWayDateTime} class="w-3xs mx-auto"> 
+     <p class=" font-bold text-purple-600">{infoModal}</p>
 <div class="flex gap-10 justify-center mt-10 m-4"> 
-   
+
+
+
+   <!-- SUMBIT -->
   <button class="border rounded-2xl p-3 cursor-pointer hover:bg-green-200"
-    onclick={() => {
-        isOneWayCalendar= false
-    }}
-    >Submit</button>
+    
+        onclick={() => {
+          handleOneWayBook();
+        }} >Submit</button>
 
   
-
+   <!-- CLOSE -->
     <button class="border rounded-2xl p-3  cursor-pointer hover:bg-red-200"
     onclick={() => {
         isOneWayCalendar= false
@@ -77,6 +154,9 @@
  </section>
  {/if}
 
+
+
+
  <!-- Return -->
 
    {#if isReturnFlightCalendar}
@@ -84,22 +164,26 @@
   <div class="relative flex w-lg flex-col  border border-black mx-auto lg:mt-44 rounded-3xl shadow-2xl  ">
    <h1 class="text-2xl">Return Flight</h1>
 
+ <!-- INPUT RETURN -->
 <input type="datetime-local" bind:value={ReturnFlightDateTime} class="w-3xs mx-auto"> 
+      
     <div class="flex gap-10 justify-center mt-10 m-4"> <div>
 
+<!-- RETURN2 -->
 <input type="datetime-local" bind:value={ReturnFlightDateTime2} class="w-3xs mx-auto"> 
+    <p class=" font-bold text-purple-600">{infoModal2}</p>
    <div class="flex justify-center gap-10 mt-10 m-4 "></div>
 
 
-
+<!-- SUBMIT -->
 <div class="flex justify-center gap-10 mt-6">
   <button class="border rounded-2xl p-3 cursor-pointer hover:bg-green-200"
     onclick={() => {
-        isReturnFlightCalendar= false
-    }}
-    >Submit</button>
+          handleReturnBook();
+          handleReturnBook2();
+        }} >Submit</button>
 
-  
+  <!-- CLOSE -->
 
     <button class="border rounded-2xl p-3  cursor-pointer hover:bg-red-200 "
     onclick={() => {
@@ -110,11 +194,46 @@
       </div>
        </div>
        </div>
-"</section>
+</section>
  {/if}
 
+<!-- ONEWAY -->
+<article>
+  {#each oneWayList as item}
+  <div class=" mt-10 flex justify-center gap-5 flex-col">
+    <p class=" font-bold text-2xl ">Booked Succesfully</p>
+   <p>{item}</p> 
 
+  <button
+  class=" text-red-500  font-bold cursor-pointer"
+   onclick={() =>{
+    oneWayList = [];
+  }} >Delete</button>
 
+ 
+  </div>
+ {/each}
+</article>
+
+<!-- RETURN -->
+
+<article>
+  {#each ReturnList2 as item}
+  <div class=" mt-10 flex justify-center gap-5 flex-col">
+    <p class=" font-bold text-2xl ">Booked Succesfully</p>
+   <p>{item}</p> 
+
+  <button
+  class=" text-red-500  font-bold cursor-pointer"
+   onclick={() =>{
+    ReturnList = [];
+    ReturnList2 = [];
+  }} >Delete</button>
+
+ 
+  </div>
+ {/each}
+</article>
 
 </main>
 
