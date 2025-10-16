@@ -28,6 +28,8 @@
 			infoModal = 'Thank you for choosing your Date. Modal closing...';
 			setTimeout(() => {
 				isOneWayCalendar = false;
+				localStorage.removeItem('returnFlight');
+				returnFlight = [];
 				infoModal = '';
 			}, 3000);
 		} else {
@@ -39,11 +41,14 @@
 	function handleReturnBook() {
 		if (ReturnFlightDateTime && ReturnFlightDateTime2) {
 			returnFlight.slice(0, returnFlight.length);
-			localStorage.setItem('Return', ReturnList.toString());
-
+			returnFlight.push(ReturnFlightDateTime, ReturnFlightDateTime2);
+			// console.log('LC is', returnFlight);
+			localStorage.setItem('returnFlight', JSON.stringify(returnFlight));
 			infoModal2 = 'Thank you for choosing your Date. Modal closing...';
 			setTimeout(() => {
 				isReturnFlightCalendar = false;
+				localStorage.removeItem('Oneway');
+				oneWayList = [];
 				infoModal2 = '';
 			}, 3000);
 		} else {
@@ -52,13 +57,14 @@
 	}
 
 	$effect(() => {
-		let getLc = localStorage.getItem('oneWay');
+		let getOneWyLc = localStorage.getItem('Oneway');
+		oneWayList = getOneWyLc ? [getOneWyLc] : [];
+
 		let getReturnLc = localStorage.getItem('returnFlight');
-		oneWayList = getLc ? [getLc] : [];
-		returnFlight = getReturnLc ? returnFlight : [];
+		returnFlight = getReturnLc ? JSON.parse(getReturnLc) : [];
 	});
 
-	// $inspect(ReturnList, ReturnList2);
+	$inspect(oneWayList);
 </script>
 
 <main class="relative items-center justify-center text-center">
@@ -68,6 +74,7 @@
 
 	<div>
 		<div class=" items-center justify-center text-center">
+			<!-- one way -->
 			<section class="group mt-60 flex items-start justify-center">
 				<button
 					onclick={() => {
@@ -78,6 +85,7 @@
 					>One-way Flight</button
 				>
 			</section>
+			<!-- Return flight -->
 			<section>
 				<button
 					onclick={() => {
@@ -91,6 +99,7 @@
 		</div>
 	</div>
 
+	<!--  -->
 	<!-- Oneway -->
 	{#if isOneWayCalendar}
 		<section
@@ -125,8 +134,8 @@
 		</section>
 	{/if}
 
+	<!--  -->
 	<!-- Return -->
-
 	{#if isReturnFlightCalendar}
 		<section
 			class="absolute left-0 top-0 h-full min-h-screen w-full bg-gray-500/10 backdrop-blur-sm"
@@ -171,38 +180,41 @@
 	{/if}
 
 	<!-- ONEWAY -->
-	<article>
-		{#each oneWayList as item}
-			<div class=" mt-10 flex flex-col justify-center gap-5">
-				<p class=" text-2xl font-bold">Booked Succesfully</p>
-				<p>{item}</p>
+	{#if oneWayList.length > 0}
+		<h1 class="mx-auto mt-4 w-fit bg-orange-300 p-2">You choose one way flight!</h1>
+		<article class="mx-auto w-fit rounded-lg border p-2">
+			{#each oneWayList as item}
+				<div class="flex flex-col justify-center gap-5">
+					<p class=" text-2xl font-bold">Start flight</p>
+					<p>{item}</p>
 
-				<button
-					class=" cursor-pointer font-bold text-red-500"
-					onclick={() => {
-						oneWayList = [];
-					}}>Delete</button
-				>
-			</div>
-		{/each}
-	</article>
+					<button
+						class=" cursor-pointer font-bold text-red-500"
+						onclick={() => {
+							oneWayList = [];
+							localStorage.removeItem('Oneway');
+						}}>Delete</button
+					>
+				</div>
+			{/each}
+		</article>
+	{/if}
 
 	<!-- RETURN -->
-
-	<article>
-		{#each ReturnList2 as item}
-			<div class=" mt-10 flex flex-col justify-center gap-5">
-				<p class=" text-2xl font-bold">Booked Succesfully</p>
-				<p>{item}</p>
-
-				<button
-					class=" cursor-pointer font-bold text-red-500"
-					onclick={() => {
-						ReturnList = [];
-						ReturnList2 = [];
-					}}>Delete</button
-				>
-			</div>
-		{/each}
-	</article>
+	{#if returnFlight.length === 2}
+		<h1 class="mx-auto mt-4 w-fit bg-green-300 p-2">You choose flight with return!</h1>
+		<div class="mx-auto w-fit rounded-lg border p-2">
+			<p class=" text-2xl font-bold">Start date</p>
+			<p>{returnFlight[0]}</p>
+			<p class=" text-2xl font-bold">Return date</p>
+			<p>{returnFlight[1]}</p>
+			<button
+				class=" cursor-pointer font-bold text-red-500"
+				onclick={() => {
+					returnFlight = [];
+					localStorage.removeItem('returnFlight');
+				}}>Delete</button
+			>
+		</div>
+	{/if}
 </main>
